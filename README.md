@@ -1,4 +1,6 @@
-### Hi there 👋
+### Hi there 👋 I'm Mohamed Selim
+
+I'm a Flutter team leader mainly build aweosme apps.
 
 <img src="https://github-readme-stats.vercel.app/api?username=mokhselim&show_icons=true&theme=ADD_THEME_HERE" width="400">
 
