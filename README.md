@@ -1,6 +1,6 @@
 ### Hi there 👋 I'm Mohamed Selim
 
-I'm a Flutter team leader mainly build aweosme apps.
+I'm a Flutter team leader mainly build awesome apps.
 
 [![GitHub Streak](https://github-readme-streak-stats.herokuapp.com?user=mokhselim)](https://git.io/streak-stats)
 
