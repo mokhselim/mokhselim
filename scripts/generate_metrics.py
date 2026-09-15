@@ -132,6 +132,12 @@ def fetch() -> dict:
 
 # ---- aggregation --------------------------------------------------------------
 
+def top_langs(counter: Counter):
+    """Top languages by bytes, dropping anything under 0.1% (config/boilerplate noise)."""
+    total = sum(counter.values()) or 1
+    return [(n, v) for n, v in counter.most_common(LANG_LIMIT) if v / total >= 0.001]
+
+
 def aggregate(raw: dict) -> dict:
     v, repos, now = raw["viewer"], raw["repos"], raw["now"]
     cc = v["contributionsCollection"]
@@ -201,8 +207,8 @@ def aggregate(raw: dict) -> dict:
         "streak_current": current, "streak_best": best,
         "busiest_day": busiest, "active_days": active_days,
         "calendar": days, "weeks": weeks,
-        "lang_all": lang_all.most_common(LANG_LIMIT), "lang_all_total": sum(lang_all.values()),
-        "lang_recent": lang_recent.most_common(LANG_LIMIT), "lang_recent_total": sum(lang_recent.values()),
+        "lang_all": top_langs(lang_all), "lang_all_total": sum(lang_all.values()),
+        "lang_recent": top_langs(lang_recent), "lang_recent_total": sum(lang_recent.values()),
         "colors": colors,
         "by_weekday": by_weekday, "by_hour": by_hour, "habit_commits": habit_commits,
         "updated": now.astimezone(TZ).strftime("%d %b %Y, %H:%M %Z"),
