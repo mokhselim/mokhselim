@@ -232,64 +232,69 @@ def fmt(n: int) -> str:
 
 
 def overview_card(m: dict) -> str:
-    tiles = [
-        ("Commits", fmt(m["commits_year"]), "past 12 months"),
-        ("Contributions", fmt(m["contributions_year"]), "all types"),
-        ("Repositories", fmt(m["repos_total"]), f'{m["repos_private"]} private'),
-        ("Active days", fmt(m["active_days"]), "past 12 months"),
-        ("Current streak", f'{m["streak_current"]}d', "consecutive days"),
-        ("Best streak", f'{m["streak_best"]}d', "past 12 months"),
-        ("Busiest day", fmt(m["busiest_day"]), "contributions"),
-        ("Followers", fmt(m["followers"]), f'{m["years"]} yrs on GitHub'),
-    ]
-    W, H, cols = 440, 232, 4
-    tw = (W - 40) / cols
+    W, H = 440, 272
     body = []
-    for i, (label, value, sub) in enumerate(tiles):
-        x = 20 + (i % cols) * tw
-        y = 62 + (i // cols) * 82
-        body.append(f'<text x="{x:.0f}" y="{y}" font-size="11" fill="{INK_2}">{esc(label)}</text>'
-                    f'<text x="{x:.0f}" y="{y+26}" font-size="24" font-weight="700" fill="{INK}">{esc(value)}</text>'
-                    f'<text x="{x:.0f}" y="{y+42}" font-size="10" fill="{INK_3}">{esc(sub)}</text>')
-    return card(W, H, "Activity overview", "".join(body), "includes private repos · counts only")
+    # hero number
+    body.append(f'<text x="20" y="92" font-size="44" font-weight="700" fill="{INK}" letter-spacing="-1">{esc(fmt(m["commits_year"]))}</text>'
+                f'<text x="20" y="112" font-size="11" fill="{INK_2}">commits in the past 12 months</text>')
+    # weekly sparkline (area + line), right side of the hero
+    weekly = [sum(c for _, _, c in w) for w in m["weeks"]]
+    if weekly:
+        sx0, sx1, sy0, sy1 = 200, 420, 52, 112
+        mx = max(weekly) or 1
+        n = len(weekly)
+        pts = [(sx0 + i * (sx1 - sx0) / max(n - 1, 1), sy1 - (sy1 - sy0) * v / mx) for i, v in enumerate(weekly)]
+        line = " ".join(f"{x:.1f},{y:.1f}" for x, y in pts)
+        body.append('<defs><linearGradient id="sp" x1="0" y1="0" x2="0" y2="1">'
+                    f'<stop offset="0" stop-color="{BLUE}" stop-opacity="0.35"/><stop offset="1" stop-color="{BLUE}" stop-opacity="0"/></linearGradient></defs>'
+                    f'<polygon points="{sx0:.1f},{sy1} {line} {sx1:.1f},{sy1}" fill="url(#sp)"/>'
+                    f'<polyline points="{line}" fill="none" stroke="{BLUE}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>')
+        pi = weekly.index(mx)
+        px, py = pts[pi]
+        body.append(f'<circle cx="{px:.1f}" cy="{py:.1f}" r="4" fill="{BLUE}" stroke="{SURFACE}" stroke-width="2"/>'
+                    f'<text x="{min(max(px, sx0 + 40), sx1 - 40):.1f}" y="{py - 9:.1f}" text-anchor="middle" font-size="10" fill="{INK_2}">peak week · {mx}</text>'
+                    f'<text x="{sx1}" y="{sy1 + 14}" text-anchor="end" font-size="9" fill="{INK_3}">weekly contributions</text>')
+    body.append(f'<line x1="20" y1="146" x2="{W-20}" y2="146" stroke="{BORDER}"/>')
+    tiles = [
+        (fmt(m["active_days"]), "active days"),
+        (f'{m["streak_current"]}d', "current streak"),
+        (f'{m["streak_best"]}d', "best streak"),
+        (fmt(m["repos_total"]), "repositories"),
+    ]
+    tw = (W - 40) / len(tiles)
+    for i, (value, label) in enumerate(tiles):
+        x = 20 + i * tw
+        if i:
+            body.append(f'<line x1="{x-12:.0f}" y1="170" x2="{x-12:.0f}" y2="212" stroke="{BORDER}"/>')
+        body.append(f'<text x="{x:.0f}" y="194" font-size="22" font-weight="700" fill="{INK}">{esc(value)}</text>'
+                    f'<text x="{x:.0f}" y="211" font-size="10" fill="{INK_2}">{esc(label)}</text>')
+    foot = f'{m["repos_private"]} private repos · {m["followers"]} followers · {m["years"]} yrs on GitHub · counts only'
+    return card(W, H, "Activity overview", "".join(body), foot)
 
 
 def languages_card(m: dict) -> str:
-    W, H = 440, 256
+    W, H = 440, 272
     body = []
 
-    def section(y0: int, label: str, items, total: int) -> int:
-        body.append(f'<text x="20" y="{y0}" font-size="11" fill="{INK_2}">{esc(label)}</text>')
+    def column(x0: int, w: int, label: str, items, total: int, rows: int):
+        body.append(f'<text x="{x0}" y="58" font-size="11" fill="{INK_2}">{esc(label)}</text>')
         if not items or not total:
-            body.append(f'<text x="20" y="{y0+22}" font-size="11" fill="{INK_3}">No data yet</text>')
-            return y0 + 40
-        # stacked bar with 2px surface gaps, rounded ends via clip
-        bx, bw, by, bh = 20, W - 40, y0 + 10, 8
-        body.append(f'<clipPath id="c{y0}"><rect x="{bx}" y="{by}" width="{bw}" height="{bh}" rx="4"/></clipPath>'
-                    f'<g clip-path="url(#c{y0})">')
-        x = bx
-        shown = items[:6]
-        for name, size in shown:
-            seg = bw * size / total
-            body.append(f'<rect x="{x:.1f}" y="{by}" width="{max(seg-2,0):.1f}" height="{bh}" fill="{m["colors"].get(name, INK_3)}"/>')
-            x += seg
-        if x < bx + bw - 2:   # remainder = languages outside the top list
-            body.append(f'<rect x="{x:.1f}" y="{by}" width="{bx+bw-x:.1f}" height="{bh}" fill="{BORDER}"/>')
-        body.append("</g>")
-        # legend: dot + name + % (text in ink tokens, never series color)
-        col_w = (W - 40) / 2
-        for i, (name, size) in enumerate(shown):
-            lx = 20 + (i % 2) * col_w
-            ly = by + 26 + (i // 2) * 16
+            body.append(f'<text x="{x0}" y="82" font-size="11" fill="{INK_3}">No data yet</text>')
+            return
+        for i, (name, size) in enumerate(items[:rows]):
+            y = 80 + i * 28
             pct = 100 * size / total
-            body.append(f'<circle cx="{lx+4}" cy="{ly-4}" r="4" fill="{m["colors"].get(name, INK_3)}"/>'
-                        f'<text x="{lx+14}" y="{ly}" font-size="11" fill="{INK}">{esc(name)}</text>'
-                        f'<text x="{lx+col_w-8}" y="{ly}" font-size="11" text-anchor="end" fill="{INK_2}">{pct:.1f}%</text>')
-        return by + 26 + ((len(shown) + 1) // 2) * 16 + 6
+            color = m["colors"].get(name, INK_3)
+            body.append(f'<text x="{x0}" y="{y}" font-size="11" fill="{INK}">{esc(name)}</text>'
+                        f'<text x="{x0+w}" y="{y}" font-size="11" text-anchor="end" fill="{INK_2}">{pct:.1f}%</text>'
+                        f'<rect x="{x0}" y="{y+6}" width="{w}" height="6" rx="3" fill="{BORDER}"/>'
+                        f'<rect x="{x0}" y="{y+6}" width="{max(6, w * pct / 100):.1f}" height="6" rx="3" fill="{color}"/>')
 
-    y = section(58, "Most used · all repositories", m["lang_all"], m["lang_all_total"])
-    section(y + 10, f"Recently used · repos touched in the last {RECENT_DAYS} days", m["lang_recent"][:4], m["lang_recent_total"])
-    return card(W, H, "Languages", "".join(body), "by bytes · generated boilerplate excluded")
+    col_w = 190
+    column(20, col_w, "Most used · all repos", m["lang_all"], m["lang_all_total"], 6)
+    body.append(f'<line x1="{W//2}" y1="52" x2="{W//2}" y2="{H-34}" stroke="{BORDER}"/>')
+    column(W - 20 - col_w, col_w, f"Recently used · last {RECENT_DAYS} days", m["lang_recent"], m["lang_recent_total"], 6)
+    return card(W, H, "Languages", "".join(body), "share of bytes · generated boilerplate excluded")
 
 
 def calendar_card(m: dict) -> str:

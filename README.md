@@ -6,9 +6,8 @@
 
 Shipping consumer apps end‑to‑end — product, design, code, backend, and App Store growth.
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-mo--kh--selim-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/mo-kh-selim/)
-[![Email](https://img.shields.io/badge/Email-mokhselim%40gmail.com-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](mailto:mokhselim@gmail.com)
-[![Profile Views](https://komarev.com/ghpvc/?username=mokhselim&style=for-the-badge&color=58A6FF)](https://github.com/mokhselim)
+<a href="https://www.linkedin.com/in/mo-kh-selim/"><img src="assets/linkedin.svg" alt="LinkedIn · in/mo-kh-selim" height="48" /></a>&nbsp;&nbsp;
+<a href="mailto:mokhselim@gmail.com"><img src="assets/email.svg" alt="Email · mokhselim@gmail.com" height="48" /></a>
 
 </div>
 
