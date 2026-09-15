@@ -441,8 +441,8 @@ def studio_card() -> str:
     arr = cfg.get("arr_usd")
     if arr:
         arr_txt = f"${arr/1000:.0f}K" if arr < 1_000_000 else f"${arr/1_000_000:.1f}M"
-        body.append(f'<text x="20" y="96" font-size="56" font-weight="700" fill="{INK}" letter-spacing="-1.5">{esc(arr_txt)}</text>'
-                    f'<text x="22" y="116" font-size="12" font-weight="600" fill="{INK_2}" letter-spacing="1.5">ARR</text>')
+        body.append(f'<text x="20" y="94" font-size="44" font-weight="700" fill="{INK}" letter-spacing="-1">{esc(arr_txt)}</text>'
+                    f'<text x="21" y="114" font-size="11.5" font-weight="600" fill="{INK_2}" letter-spacing="1.5">ARR</text>')
     # (value, label, column width)
     tiles = [("100%", "solo-built", 170)]
     if cfg.get("apps_live"):

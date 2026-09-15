@@ -6,8 +6,8 @@
 
 Shipping consumer apps end‑to‑end — product, design, code, backend, and App Store growth.
 
-<a href="https://www.linkedin.com/in/mo-kh-selim/"><img src="assets/linkedin.svg" alt="LinkedIn · in/mo-kh-selim" height="48" /></a>&nbsp;&nbsp;
-<a href="mailto:mokhselim@gmail.com"><img src="assets/email.svg" alt="Email · mokhselim@gmail.com" height="48" /></a>
+<a href="https://www.linkedin.com/in/mo-kh-selim/"><img src="assets/linkedin.svg?v=3" alt="LinkedIn · in/mo-kh-selim" height="48" /></a>&nbsp;&nbsp;
+<a href="mailto:mokhselim@gmail.com"><img src="assets/email.svg?v=3" alt="Email · mokhselim@gmail.com" height="48" /></a>
 
 </div>
 
@@ -17,9 +17,9 @@ Shipping consumer apps end‑to‑end — product, design, code, backend, and Ap
 
 <div align="center">
 
-<img src="assets/studio-banner.jpg" alt="" width="100%" />
+<img src="assets/studio-banner.jpg?v=3" alt="" width="100%" />
 
-<img src="metrics/studio.svg" alt="The studio: ARR, solo-built, platforms, indie since" width="100%" />
+<img src="metrics/studio.svg?v=3" alt="The studio: ARR, solo-built, platforms, indie since" width="100%" />
 
 </div>
 
@@ -41,13 +41,13 @@ I spend most of my time building and shipping iOS apps — from a blank Xcode pr
 <!-- Cards are generated daily by scripts/generate_metrics.py via GitHub Actions. -->
 <div align="center">
 
-<img src="metrics/overview.svg" alt="Activity overview: commits, weekly contributions, streaks, repositories" width="100%" />
+<img src="metrics/overview.svg?v=3" alt="Activity overview: commits, weekly contributions, streaks, repositories" width="100%" />
 
-<img src="metrics/languages.svg" alt="Most used and recently used languages, and what I build by platform" width="100%" />
+<img src="metrics/languages.svg?v=3" alt="Most used and recently used languages, and what I build by platform" width="100%" />
 
-<img src="metrics/calendar.svg" alt="Contribution calendar for the past year" width="100%" />
+<img src="metrics/calendar.svg?v=3" alt="Contribution calendar for the past year" width="100%" />
 
-<img src="metrics/habits.svg" alt="Commits by weekday and by hour of day" width="100%" />
+<img src="metrics/habits.svg?v=3" alt="Commits by weekday and by hour of day" width="100%" />
 
 </div>
 
