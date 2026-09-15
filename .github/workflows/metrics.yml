@@ -39,15 +39,15 @@ jobs:
           commits_authoring: mokhselim
 
           # Languages — % by bytes across all repos incl. private. Names of languages only.
+          # NOTE: the "recently-used" section is left out on purpose — its analyzer
+          # crashes on commit events without a payload (recent.mjs:70 TypeError).
           plugin_languages: yes
           plugin_languages_indepth: yes
           plugin_languages_analysis_timeout: 30
-          plugin_languages_sections: most-used, recently-used
+          plugin_languages_sections: most-used
           plugin_languages_limit: 8
           plugin_languages_ignored: c++, cmake, c, objective-c, html, css, shell, ruby, makefile
           plugin_languages_details: percentage
-          plugin_languages_recent_load: 500
-          plugin_languages_recent_days: 30
 
           # Coding habits — commit hours / weekdays. No commit messages, no repo names.
           plugin_habits: yes
