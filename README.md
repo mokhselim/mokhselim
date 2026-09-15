@@ -34,21 +34,9 @@ Most of that work lives in private repos, but the activity graphs below tell the
 
 <div align="center">
 
-<!-- Generated daily by the metrics action. Aggregate numbers + language names only — no repo names, ever. -->
-<img src="github-metrics.svg" alt="GitHub metrics" width="100%" />
-
-<img src="https://github-readme-streak-stats.herokuapp.com?user=mokhselim&theme=tokyonight&hide_border=true&background=00000000" alt="GitHub streak" height="165" />
-<img src="https://github-readme-stats.vercel.app/api?username=mokhselim&show_icons=true&theme=tokyonight&hide_border=true&bg_color=00000000&count_private=true&include_all_commits=true" alt="GitHub stats" height="165" />
-
-<img src="https://github-readme-activity-graph.vercel.app/graph?username=mokhselim&theme=tokyo-night&hide_border=true&bg_color=00000000&area=true" alt="Contribution graph" width="100%" />
-
-</div>
-
-## 🏆 Highlights
-
-<div align="center">
-
-<img src="https://github-profile-trophy.vercel.app/?username=mokhselim&theme=tokyonight&no-frame=true&no-bg=true&margin-w=8&column=7" alt="Trophies" />
+<!-- Generated daily by .github/workflows/metrics.yml — runs in this repo, so it never depends on third-party hosting.
+     Aggregate numbers + language names only. No repo names, ever. -->
+<img src="github-metrics.svg" alt="GitHub metrics: commits, languages, coding habits, contribution calendar" width="100%" />
 
 </div>
 
