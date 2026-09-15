@@ -32,11 +32,16 @@ Most of that work lives in private repos, but the activity graphs below tell the
 
 ## 📊 Activity
 
+<!-- Cards are generated daily by scripts/generate_metrics.py via GitHub Actions — straight from the
+     GitHub API, no third-party services. Aggregate numbers + language names only. No repo names, ever. -->
 <div align="center">
 
-<!-- Generated daily by .github/workflows/metrics.yml — runs in this repo, so it never depends on third-party hosting.
-     Aggregate numbers + language names only. No repo names, ever. -->
-<img src="github-metrics.svg" alt="GitHub metrics: commits, languages, coding habits, contribution calendar" width="100%" />
+<img src="metrics/overview.svg" alt="Activity overview: commits, contributions, repositories, streaks" width="440" />&nbsp;
+<img src="metrics/languages.svg" alt="Most used and recently used languages" width="440" />
+
+<img src="metrics/calendar.svg" alt="Contribution calendar for the past year" width="100%" />
+
+<img src="metrics/habits.svg" alt="Commits by weekday and by hour of day" width="100%" />
 
 </div>
 
