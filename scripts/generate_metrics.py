@@ -38,7 +38,7 @@ LANG_IGNORED = {
     "Shell", "Ruby", "Makefile", "Batchfile", "PowerShell", "Dockerfile",
     "Rich Text Format", "Starlark", "Nix",
     # vendored / compiled blobs that linguist misattributes
-    "Assembly", "GLSL", "Metal", "Roff",
+    "Assembly", "GLSL", "Metal", "Roff", "XSLT", "XML", "Plist", "YAML", "JSON",
 }
 
 # ---- palette (dark surface; values validated for >=3:1 on it) ----------------
@@ -291,7 +291,8 @@ def platform_split(lang_counter) -> list[tuple[str, int, str]]:
     other = sum(n for l, n in lang_counter if l not in seen)
     if other:
         out.append(("Other", other, INK_3))
-    return out
+    total = sum(v for _, v, _ in out) or 1
+    return [p for p in out if p[1] / total >= 0.005]   # drop slivers that would round to 0%
 
 
 def donut(cx: float, cy: float, r: float, thick: float, parts, total: int) -> str:
