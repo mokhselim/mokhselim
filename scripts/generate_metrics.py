@@ -37,6 +37,8 @@ LANG_IGNORED = {
     "C++", "C", "CMake", "Objective-C", "Objective-C++", "HTML", "CSS", "SCSS",
     "Shell", "Ruby", "Makefile", "Batchfile", "PowerShell", "Dockerfile",
     "Rich Text Format", "Starlark", "Nix",
+    # vendored / compiled blobs that linguist misattributes
+    "Assembly", "GLSL", "Metal", "Roff",
 }
 
 # ---- palette (dark surface; values validated for >=3:1 on it) ----------------
@@ -351,7 +353,7 @@ def habits_card(m: dict) -> str:
         wd = max(m["by_weekday"], key=m["by_weekday"].get)
         hr = max(m["by_hour"], key=m["by_hour"].get)
         period = "morning" if 5 <= hr < 12 else "afternoon" if 12 <= hr < 18 else "evening" if 18 <= hr < 23 else "night"
-        foot = f'{m["habit_commits"]} commits in the last {HABITS_DAYS} days · most active on {["Mon","Tue","Wed","Thu","Fri","Sat","Sun"][wd]}s, in the {period}'
+        foot = f'{m["habit_commits"]} commits in the last {HABITS_DAYS} days · most active on {["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"][wd]}s, in the {period}'
     else:
         body.append(f'<text x="20" y="80" font-size="11" fill="{INK_3}">No commits found in the last {HABITS_DAYS} days</text>')
         foot = ""
