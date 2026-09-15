@@ -1,0 +1,66 @@
+name: Profile metrics
+
+on:
+  schedule:
+    - cron: "0 3 * * *"   # daily, 03:00 UTC
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+# PRIVACY: this profile repo is public, so the generated github-metrics.svg is public.
+# Every enabled plugin below outputs ONLY aggregate numbers and language names.
+# Anything that prints repository names, titles, descriptions, or commit messages
+# is deliberately left off. Do not enable: plugin_activity, plugin_repositories,
+# plugin_stargazers, plugin_starlists, plugin_topics, plugin_projects,
+# plugin_notable, plugin_lines_sections=repositories, plugin_habits_trim=no.
+
+jobs:
+  metrics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: lowlighter/metrics@latest
+        with:
+          # Classic PAT with `repo` + `read:user` scopes, stored as a repo secret.
+          # `repo` lets the action count private repos; the token never leaves the runner.
+          token: ${{ secrets.METRICS_TOKEN }}
+          user: mokhselim
+          filename: github-metrics.svg
+          template: classic
+          # header  = name / followers
+          # activity = commit / PR / issue COUNTS
+          # community = followers / following COUNTS
+          # repositories = repo / star COUNTS (no names)
+          base: header, activity, community, repositories, metadata
+          config_timezone: Africa/Cairo
+          repositories_affiliations: owner, collaborator
+          commits_authoring: mokhselim
+
+          # Languages — % by bytes across all repos incl. private. Names of languages only.
+          plugin_languages: yes
+          plugin_languages_indepth: yes
+          plugin_languages_analysis_timeout: 30
+          plugin_languages_sections: most-used, recently-used
+          plugin_languages_limit: 8
+          plugin_languages_ignored: c++, cmake, c, objective-c, html, css, shell, ruby, makefile
+          plugin_languages_details: percentage
+          plugin_languages_recent_load: 500
+          plugin_languages_recent_days: 30
+
+          # Coding habits — commit hours / weekdays. No commit messages, no repo names.
+          plugin_habits: yes
+          plugin_habits_from: 500
+          plugin_habits_days: 30
+          plugin_habits_charts: yes
+          plugin_habits_facts: yes
+          plugin_habits_trim: yes
+
+          # Isometric contribution calendar — counts per day only
+          plugin_isocalendar: yes
+          plugin_isocalendar_duration: full-year
+
+          # Lines added / removed — totals only ("base"). NEVER set to "repositories".
+          plugin_lines: yes
+          plugin_lines_sections: base

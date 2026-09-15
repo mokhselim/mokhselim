@@ -1,0 +1,49 @@
+# Profile README — setup
+
+Your GitHub username is **mokhselim**, so the profile repo is `mokhselim/mokhselim` (it already exists).
+
+## 1. Push these files
+
+```bash
+git clone git@github.com:mokhselim/mokhselim.git
+cd mokhselim
+# copy README.md and .github/workflows/metrics.yml from this folder into the repo
+git add -A && git commit -m "New profile README" && git push
+```
+
+## 2. Make private activity count (the important part)
+
+Most of your work is in private repos, so by default GitHub shows almost nothing. Two switches fix that:
+
+**a) Contribution graph + streak**
+GitHub → Settings → Profile → *Contribution settings* → tick **"Include private contributions on my profile"**.
+This makes the green graph, streak card, and activity graph count private commits. Only counts are shown, never repo names.
+
+**b) Language stats + commit habits (the `metrics` action)**
+1. GitHub → Settings → Developer settings → Personal access tokens → **Tokens (classic)** → Generate new token.
+   Scopes: `repo` and `read:user`. Set a long expiry (or no expiry).
+2. In the `mokhselim/mokhselim` repo → Settings → Secrets and variables → Actions → **New repository secret**
+   Name: `METRICS_TOKEN`, value: the token.
+3. Actions tab → *Profile metrics* → **Run workflow**. After ~1–2 min it commits `github-metrics.svg` and the README picks it up.
+   It then re-runs daily at 03:00 UTC.
+
+## 3. Optional
+
+- Update your bio from "Flutter Developer" to something like *"Senior mobile engineer · SwiftUI + Flutter · shipping apps"* — it shows next to your avatar.
+- Pin 6 public repos (`ios_color_picker`, `animated_side_bar`, `Flutter-e-commerce-ShopApp`, etc.) so the profile isn't empty below the README.
+- The `github-readme-stats` card's `count_private=true` only works if you self-host it on Vercel with a token.
+  The metrics action already covers private stats, so you can ignore that unless you want the small card to match.
+
+## 4. What is and isn't visible (privacy)
+
+Everything public is **numbers and language names only**. Nowhere does a private repo name, app name, description, or commit message appear.
+
+| Public element | Shows | Never shows |
+|---|---|---|
+| GitHub contribution graph (with private contributions on) | Green squares, commit counts | Repo names — GitHub hides them by design |
+| Streak / stats / activity-graph cards | Counts, streak days | Anything private (they can only read public data) |
+| `github-metrics.svg` (the action) | Language %, commit hours/days, lines changed, repo *count* | Repo names, titles, commit messages — those plugins are disabled and documented as off-limits in the workflow file |
+| README text | Skills and stack in general terms | App names, categories, features, links |
+
+The `METRICS_TOKEN` gives the action read access to private repos **inside the runner only**; it is a repo secret and is never written to the SVG or logs.
+If you ever edit `metrics.yml`, keep the "do not enable" list at the top intact.
