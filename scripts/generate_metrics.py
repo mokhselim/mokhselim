@@ -232,15 +232,13 @@ def fmt(n: int) -> str:
 
 
 def overview_card(m: dict) -> str:
-    W, H = 440, 272
+    W, H = 900, 250
     body = []
-    # hero number
-    body.append(f'<text x="20" y="92" font-size="44" font-weight="700" fill="{INK}" letter-spacing="-1">{esc(fmt(m["commits_year"]))}</text>'
-                f'<text x="20" y="112" font-size="11" fill="{INK_2}">commits in the past 12 months</text>')
-    # weekly sparkline (area + line), right side of the hero
+    body.append(f'<text x="20" y="100" font-size="58" font-weight="700" fill="{INK}" letter-spacing="-1.5">{esc(fmt(m["commits_year"]))}</text>'
+                f'<text x="20" y="122" font-size="12" fill="{INK_2}">commits in the past 12 months</text>')
     weekly = [sum(c for _, _, c in w) for w in m["weeks"]]
     if weekly:
-        sx0, sx1, sy0, sy1 = 200, 420, 52, 112
+        sx0, sx1, sy0, sy1 = 300, 880, 56, 122
         mx = max(weekly) or 1
         n = len(weekly)
         pts = [(sx0 + i * (sx1 - sx0) / max(n - 1, 1), sy1 - (sy1 - sy0) * v / mx) for i, v in enumerate(weekly)]
@@ -253,27 +251,71 @@ def overview_card(m: dict) -> str:
         px, py = pts[pi]
         body.append(f'<circle cx="{px:.1f}" cy="{py:.1f}" r="4" fill="{BLUE}" stroke="{SURFACE}" stroke-width="2"/>'
                     f'<text x="{min(max(px, sx0 + 40), sx1 - 40):.1f}" y="{py - 9:.1f}" text-anchor="middle" font-size="10" fill="{INK_2}">peak week · {mx}</text>'
-                    f'<text x="{sx1}" y="{sy1 + 14}" text-anchor="end" font-size="9" fill="{INK_3}">weekly contributions</text>')
-    body.append(f'<line x1="20" y1="146" x2="{W-20}" y2="146" stroke="{BORDER}"/>')
+                    f'<text x="{sx1}" y="{sy1 + 14}" text-anchor="end" font-size="9" fill="{INK_3}">weekly contributions · past 12 months</text>')
+    body.append(f'<line x1="20" y1="150" x2="{W-20}" y2="150" stroke="{BORDER}"/>')
     tiles = [
+        (fmt(m["contributions_year"]), "contributions"),
         (fmt(m["active_days"]), "active days"),
         (f'{m["streak_current"]}d', "current streak"),
         (f'{m["streak_best"]}d', "best streak"),
+        (fmt(m["busiest_day"]), "busiest day"),
         (fmt(m["repos_total"]), "repositories"),
     ]
     tw = (W - 40) / len(tiles)
     for i, (value, label) in enumerate(tiles):
         x = 20 + i * tw
         if i:
-            body.append(f'<line x1="{x-12:.0f}" y1="170" x2="{x-12:.0f}" y2="212" stroke="{BORDER}"/>')
-        body.append(f'<text x="{x:.0f}" y="194" font-size="22" font-weight="700" fill="{INK}">{esc(value)}</text>'
-                    f'<text x="{x:.0f}" y="211" font-size="10" fill="{INK_2}">{esc(label)}</text>')
-    foot = f'{m["repos_private"]} private repos · {m["followers"]} followers · {m["years"]} yrs on GitHub · counts only'
+            body.append(f'<line x1="{x-14:.0f}" y1="172" x2="{x-14:.0f}" y2="214" stroke="{BORDER}"/>')
+        body.append(f'<text x="{x:.0f}" y="196" font-size="24" font-weight="700" fill="{INK}">{esc(value)}</text>'
+                    f'<text x="{x:.0f}" y="213" font-size="10.5" fill="{INK_2}">{esc(label)}</text>')
+    foot = f'{m["repos_private"]} private repos · {m["followers"]} followers · {m["years"]} yrs on GitHub · includes private work · counts only'
     return card(W, H, "Activity overview", "".join(body), foot)
 
 
+PLATFORMS = [  # fixed order, fixed hue — never cycled
+    ("Native iOS", {"Swift", "Objective-C"}, "#F05138"),
+    ("Flutter", {"Dart"}, "#00B4AB"),
+    ("Web", {"Astro", "JavaScript", "TypeScript", "Vue", "Svelte", "HTML", "CSS", "MDX"}, "#f1e05a"),
+    ("Backend", {"Python", "Go", "Rust", "Java", "Kotlin", "PHP"}, "#3572A5"),
+]
+
+
+def platform_split(lang_counter) -> list[tuple[str, int, str]]:
+    out = []
+    seen = set()
+    for label, langs, color in PLATFORMS:
+        v = sum(n for l, n in lang_counter if l in langs)
+        seen |= langs
+        if v:
+            out.append((label, v, color))
+    other = sum(n for l, n in lang_counter if l not in seen)
+    if other:
+        out.append(("Other", other, INK_3))
+    return out
+
+
+def donut(cx: float, cy: float, r: float, thick: float, parts, total: int) -> str:
+    import math
+    out = []
+    start = -math.pi / 2
+    gap = 0.035 if len(parts) > 1 else 0            # 2px-ish surface gap between slices
+    for _, v, color in parts:
+        frac = v / total
+        if frac >= 0.999:
+            out.append(f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="{color}" stroke-width="{thick}"/>')
+            break
+        a0, a1 = start + gap / 2, start + frac * 2 * math.pi - gap / 2
+        if a1 > a0:
+            x0, y0 = cx + r * math.cos(a0), cy + r * math.sin(a0)
+            x1, y1 = cx + r * math.cos(a1), cy + r * math.sin(a1)
+            large = 1 if (a1 - a0) > math.pi else 0
+            out.append(f'<path d="M{x0:.2f},{y0:.2f} A{r},{r} 0 {large} 1 {x1:.2f},{y1:.2f}" fill="none" stroke="{color}" stroke-width="{thick}" stroke-linecap="butt"/>')
+        start += frac * 2 * math.pi
+    return "".join(out)
+
+
 def languages_card(m: dict) -> str:
-    W, H = 440, 272
+    W, H = 900, 288
     body = []
 
     def column(x0: int, w: int, label: str, items, total: int, rows: int):
@@ -282,19 +324,36 @@ def languages_card(m: dict) -> str:
             body.append(f'<text x="{x0}" y="82" font-size="11" fill="{INK_3}">No data yet</text>')
             return
         for i, (name, size) in enumerate(items[:rows]):
-            y = 80 + i * 28
+            y = 82 + i * 30
             pct = 100 * size / total
             color = m["colors"].get(name, INK_3)
-            body.append(f'<text x="{x0}" y="{y}" font-size="11" fill="{INK}">{esc(name)}</text>'
-                        f'<text x="{x0+w}" y="{y}" font-size="11" text-anchor="end" fill="{INK_2}">{pct:.1f}%</text>'
-                        f'<rect x="{x0}" y="{y+6}" width="{w}" height="6" rx="3" fill="{BORDER}"/>'
-                        f'<rect x="{x0}" y="{y+6}" width="{max(6, w * pct / 100):.1f}" height="6" rx="3" fill="{color}"/>')
+            body.append(f'<text x="{x0}" y="{y}" font-size="11.5" fill="{INK}">{esc(name)}</text>'
+                        f'<text x="{x0+w}" y="{y}" font-size="11.5" text-anchor="end" fill="{INK_2}">{pct:.1f}%</text>'
+                        f'<rect x="{x0}" y="{y+7}" width="{w}" height="6" rx="3" fill="{BORDER}"/>'
+                        f'<rect x="{x0}" y="{y+7}" width="{max(6, w * pct / 100):.1f}" height="6" rx="3" fill="{color}"/>')
 
-    col_w = 190
-    column(20, col_w, "Most used · all repos", m["lang_all"], m["lang_all_total"], 6)
-    body.append(f'<line x1="{W//2}" y1="52" x2="{W//2}" y2="{H-34}" stroke="{BORDER}"/>')
-    column(W - 20 - col_w, col_w, f"Recently used · last {RECENT_DAYS} days", m["lang_recent"], m["lang_recent_total"], 6)
-    return card(W, H, "Languages", "".join(body), "share of bytes · generated boilerplate excluded")
+    col_w = 250
+    column(20, col_w, "Most used · all repositories", m["lang_all"], m["lang_all_total"], 6)
+    body.append(f'<line x1="300" y1="52" x2="300" y2="{H-36}" stroke="{BORDER}"/>')
+    column(320, col_w, f"Recently used · last {RECENT_DAYS} days", m["lang_recent"], m["lang_recent_total"], 6)
+    body.append(f'<line x1="600" y1="52" x2="600" y2="{H-36}" stroke="{BORDER}"/>')
+
+    # platform donut
+    body.append(f'<text x="620" y="58" font-size="11" fill="{INK_2}">What I build · by platform</text>')
+    parts = platform_split(m["lang_all"])
+    total = sum(v for _, v, _ in parts)
+    if parts and total:
+        cx, cy, r = 686, 160, 50
+        body.append(donut(cx, cy, r, 16, parts, total))
+        lead = max(parts, key=lambda p: p[1])
+        body.append(f'<text x="{cx}" y="{cy-2}" text-anchor="middle" font-size="18" font-weight="700" fill="{INK}">{100*lead[1]/total:.0f}%</text>'
+                    f'<text x="{cx}" y="{cy+13}" text-anchor="middle" font-size="9" fill="{INK_2}">{esc(lead[0])}</text>')
+        for i, (label, v, color) in enumerate(parts[:5]):
+            ly = 96 + i * 26
+            body.append(f'<circle cx="{762}" cy="{ly-4}" r="4" fill="{color}"/>'
+                        f'<text x="{774}" y="{ly}" font-size="11.5" fill="{INK}">{esc(label)}</text>'
+                        f'<text x="{W-20}" y="{ly}" font-size="11.5" text-anchor="end" fill="{INK_2}">{100*v/total:.0f}%</text>')
+    return card(W, H, "Languages & platforms", "".join(body), "share of bytes across all repos · generated boilerplate excluded")
 
 
 def calendar_card(m: dict) -> str:
@@ -365,13 +424,47 @@ def habits_card(m: dict) -> str:
     return card(W, H, "Coding habits", "".join(body), foot)
 
 
+def studio_card() -> str:
+    cfg_path = Path("studio.json")
+    if not cfg_path.exists():
+        return ""
+    cfg = json.loads(cfg_path.read_text())
+    W, H = 900, 156
+    body = []
+    arr = cfg.get("arr_usd")
+    if arr:
+        arr_txt = f"${arr/1000:.0f}K" if arr < 1_000_000 else f"${arr/1_000_000:.1f}M"
+        body.append(f'<text x="20" y="96" font-size="58" font-weight="700" fill="{INK}" letter-spacing="-1.5">{esc(arr_txt)}</text>'
+                    f'<text x="20" y="118" font-size="12" fill="{INK_2}">annual recurring revenue · portfolio of consumer apps</text>')
+    # (value, label, sub, column width)
+    tiles = [("100%", "solo-built", "design · code · backend · growth", 200)]
+    if cfg.get("apps_live"):
+        tiles.append((str(cfg["apps_live"]), "apps live", "App Store & Google Play", 150))
+    if cfg.get("platforms"):
+        tiles.append((esc(cfg["platforms"]), "platforms", "native iOS · Flutter · Astro", 230))
+    if cfg.get("founded_year"):
+        yrs = datetime.now().year - int(cfg["founded_year"])
+        tiles.append((f"{yrs}+ yrs", "shipping indie apps", f"since {cfg['founded_year']}", 140))
+    x = 330
+    for i, (value, label, sub, cw) in enumerate(tiles):
+        if i:
+            body.append(f'<line x1="{x-16}" y1="62" x2="{x-16}" y2="122" stroke="{BORDER}"/>')
+        body.append(f'<text x="{x}" y="88" font-size="22" font-weight="700" fill="{INK}">{value}</text>'
+                    f'<text x="{x}" y="106" font-size="11" fill="{INK_2}">{esc(label)}</text>'
+                    f'<text x="{x}" y="120" font-size="9.5" fill="{INK_3}">{esc(sub)}</text>')
+        x += cw
+    return card(W, H, "The studio", "".join(body), "self-reported · app names stay private until launch")
+
+
 def main():
     raw = fetch()
     m = aggregate(raw)
     OUT.mkdir(parents=True, exist_ok=True)
     for fn, svg in (("overview.svg", overview_card(m)), ("languages.svg", languages_card(m)),
-                    ("calendar.svg", calendar_card(m)), ("habits.svg", habits_card(m))):
-        (OUT / fn).write_text(svg, encoding="utf-8")
+                    ("calendar.svg", calendar_card(m)), ("habits.svg", habits_card(m)),
+                    ("studio.svg", studio_card())):
+        if svg:
+            (OUT / fn).write_text(svg, encoding="utf-8")
     # Log only aggregate numbers — never repo names
     print(json.dumps({k: v for k, v in m.items() if k not in ("calendar", "colors", "by_weekday", "by_hour")},
                      default=str, indent=1))

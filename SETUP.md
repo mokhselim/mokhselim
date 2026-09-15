@@ -34,7 +34,13 @@ This makes the green graph, streak card, and activity graph count private commit
 - The `github-readme-stats` card's `count_private=true` only works if you self-host it on Vercel with a token.
   The metrics action already covers private stats, so you can ignore that unless you want the small card to match.
 
-## 4. What is and isn't visible (privacy)
+## 4. The studio card (business figures)
+
+`studio.json` holds the hand-maintained numbers for the "The studio" card: `arr_usd`, `apps_live`
+(set a number to show an "apps live" tile, `null` hides it), `platforms`, and `founded_year`.
+Edit it, push, and the workflow re-renders the card. Numbers only — never put app names in it.
+
+## 5. What is and isn't visible (privacy)
 
 Everything public is **numbers and language names only**. Nowhere does a private repo name, app name, description, or commit message appear.
 

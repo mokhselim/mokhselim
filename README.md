@@ -13,6 +13,9 @@ Shipping consumer apps end‑to‑end — product, design, code, backend, and Ap
 
 ---
 
+<!-- Figures come from studio.json (hand-maintained) — numbers only, no app names. -->
+<div align="center"><img src="metrics/studio.svg" alt="The studio: ARR, solo-built, platforms, years shipping" width="100%" /></div>
+
 ## 🚀 What I do
 
 I spend most of my time building and shipping iOS apps — from a blank Xcode project to a live App Store listing.
@@ -35,8 +38,9 @@ Most of that work lives in private repos, but the activity graphs below tell the
      GitHub API, no third-party services. Aggregate numbers + language names only. No repo names, ever. -->
 <div align="center">
 
-<img src="metrics/overview.svg" alt="Activity overview: commits, contributions, repositories, streaks" width="440" />&nbsp;
-<img src="metrics/languages.svg" alt="Most used and recently used languages" width="440" />
+<img src="metrics/overview.svg" alt="Activity overview: commits, weekly contributions, streaks, repositories" width="100%" />
+
+<img src="metrics/languages.svg" alt="Most used and recently used languages, and what I build by platform" width="100%" />
 
 <img src="metrics/calendar.svg" alt="Contribution calendar for the past year" width="100%" />
 
