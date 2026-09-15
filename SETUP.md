@@ -40,6 +40,7 @@ This makes the green graph, streak card, and activity graph count private commit
 (set a number to show an "apps live" tile, `null` hides it), `platforms`, and `indie_since` (`YYYY-MM`).
 Edit it, push, and the workflow re-renders the card. Numbers only — never put app names in it.
 The banner above it is a static image at `assets/studio-banner.jpg`.
+The "What I do" card's text lives in `WHAT_I_DO` at the top of `scripts/generate_metrics.py`.
 
 ## 5. What is and isn't visible (privacy)
 

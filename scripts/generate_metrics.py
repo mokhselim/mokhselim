@@ -225,7 +225,7 @@ def card(w: int, h: int, title: str, body: str, footer: str = "") -> str:
     foot = (f'<text x="{w-16}" y="{h-12}" text-anchor="end" font-size="10" fill="{INK_3}">{esc(footer)}</text>'
             if footer else "")
     return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}" role="img" aria-label="{esc(title)}">
-<style>text{{font-family:{FONT};}}</style>
+<style>text{{font-family:{FONT};font-variant-numeric:tabular-nums;}}</style>
 <rect x="0.5" y="0.5" width="{w-1}" height="{h-1}" rx="8" fill="{SURFACE}" stroke="{BORDER}"/>
 <text x="20" y="30" font-size="15" font-weight="600" fill="{INK}">{esc(title)}</text>
 {body}
@@ -431,38 +431,80 @@ def habits_card(m: dict) -> str:
     return card(W, H, "Coding habits", "".join(body), foot)
 
 
+# ---- static, hand-edited content cards ---------------------------------------
+
+def stat_grid(cells, y_value: int = 94, y_label: int = 116, x0: int = 20, width: int = 860) -> str:
+    """Equal-width columns, one value size, one label size, hairline separators on the grid lines."""
+    out = []
+    n = len(cells)
+    cw = width / n
+    for i, (value, label) in enumerate(cells):
+        x = x0 + i * cw
+        if i:
+            out.append(f'<line x1="{x:.1f}" y1="{y_value-32}" x2="{x:.1f}" y2="{y_label+8}" stroke="{BORDER}"/>')
+        tx = x + (0 if i == 0 else 24)
+        out.append(f'<text x="{tx:.1f}" y="{y_value}" font-size="34" font-weight="700" fill="{INK}" letter-spacing="-0.5">{value}</text>'
+                   f'<text x="{tx:.1f}" y="{y_label}" font-size="12" fill="{INK_2}">{esc(label)}</text>')
+    return "".join(out)
+
+
 def studio_card() -> str:
     cfg_path = Path("studio.json")
     if not cfg_path.exists():
         return ""
     cfg = json.loads(cfg_path.read_text())
-    W, H = 900, 150
-    body = []
+    cells = []
     arr = cfg.get("arr_usd")
     if arr:
-        arr_txt = f"${arr/1000:.0f}K" if arr < 1_000_000 else f"${arr/1_000_000:.1f}M"
-        body.append(f'<text x="20" y="94" font-size="44" font-weight="700" fill="{INK}" letter-spacing="-1">{esc(arr_txt)}</text>'
-                    f'<text x="21" y="114" font-size="11.5" font-weight="600" fill="{INK_2}" letter-spacing="1.5">ARR</text>')
-    # (value, label, column width)
-    tiles = [("100%", "solo-built", 170)]
+        cells.append((esc(f"${arr/1000:.0f}K" if arr < 1_000_000 else f"${arr/1_000_000:.1f}M"), "ARR"))
+    cells.append(("100%", "solo-built"))
     if cfg.get("apps_live"):
-        tiles.append((str(cfg["apps_live"]), "apps live", 130))
+        cells.append((str(cfg["apps_live"]), "apps live"))
     if cfg.get("platforms"):
-        tiles.append((esc(cfg["platforms"]), "platforms", 320))
+        plat = [p.strip() for p in cfg["platforms"].replace("·", ",").split(",") if p.strip()]
+        cells.append((str(len(plat)), "platforms · " + ", ".join(plat)))
     if cfg.get("indie_since"):
         y0, m0 = (int(x) for x in cfg["indie_since"].split("-"))
         now = datetime.now()
         months = (now.year - y0) * 12 + (now.month - m0)
         span = f"{months} mo" if months < 12 else f"{months // 12} yr" + ("s" if months >= 24 else "")
-        tiles.append((span, f"indie since {datetime(y0, m0, 1).strftime('%b %Y')}", 140))
-    x = 300
-    for i, (value, label, cw) in enumerate(tiles):
-        if i:
-            body.append(f'<line x1="{x-18}" y1="66" x2="{x-18}" y2="112" stroke="{BORDER}"/>')
-        body.append(f'<text x="{x}" y="94" font-size="30" font-weight="700" fill="{INK}">{value}</text>'
-                    f'<text x="{x}" y="114" font-size="11.5" fill="{INK_2}">{esc(label)}</text>')
-        x += cw
-    return card(W, H, "The studio", "".join(body))
+        cells.append((span, f"indie since {datetime(y0, m0, 1).strftime('%b %Y')}"))
+    return card(900, 148, "The studio", stat_grid(cells))
+
+
+WHAT_I_DO = [  # (title, line 1, line 2, icon)
+    ("Native iOS", "SwiftUI, Widgets, Live Activities,", "App Intents, watchOS", "phone"),
+    ("Flutter", "Cross-platform apps for iOS & Android.", "Previously led a Flutter team", "layers"),
+    ("AI features", "Vision, generative models, on-device ML,", "LLM integrations", "sparkle"),
+    ("Backends", "Python (FastAPI) & Node, Firebase,", "Cloud Functions, Railway", "server"),
+    ("Web", "Astro landing pages,", "tuned for SEO", "globe"),
+    ("ASO & growth", "Keyword research, localized metadata,", "store screenshots that convert", "trend"),
+]
+
+ICONS = {  # 20x20 line icons, stroke inherits
+    "phone":   '<rect x="5" y="2" width="10" height="16" rx="2.5"/><path d="M9 15h2"/>',
+    "layers":  '<path d="M10 3l7 4-7 4-7-4z"/><path d="M3 11l7 4 7-4"/>',
+    "sparkle": '<path d="M10 2c.6 4.4 3.6 7.4 8 8-4.4.6-7.4 3.6-8 8-.6-4.4-3.6-7.4-8-8 4.4-.6 7.4-3.6 8-8z"/>',
+    "server":  '<rect x="3" y="3" width="14" height="5.5" rx="1.5"/><rect x="3" y="11.5" width="14" height="5.5" rx="1.5"/><path d="M6 5.75h.01M6 14.25h.01"/>',
+    "globe":   '<circle cx="10" cy="10" r="7.5"/><path d="M2.5 10h15M10 2.5c2.5 2.5 2.5 12.5 0 15M10 2.5c-2.5 2.5-2.5 12.5 0 15"/>',
+    "trend":   '<path d="M3 14l4.5-5 3.5 3 6-7"/><path d="M13 5h4v4"/>',
+}
+
+
+def what_i_do_card() -> str:
+    W, H = 900, 244
+    cols, gap = 3, 20
+    cw = (W - 40 - gap * (cols - 1)) / cols
+    body = []
+    for i, (title, l1, l2, icon) in enumerate(WHAT_I_DO):
+        x = 20 + (i % cols) * (cw + gap)
+        y = 58 + (i // cols) * 92
+        body.append(f'<rect x="{x:.1f}" y="{y}" width="30" height="30" rx="8" fill="{BLUE}" fill-opacity="0.14"/>'
+                    f'<g transform="translate({x+5:.1f},{y+5})" fill="none" stroke="{BLUE}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">{ICONS[icon]}</g>'
+                    f'<text x="{x+42:.1f}" y="{y+13}" font-size="13" font-weight="600" fill="{INK}">{esc(title)}</text>'
+                    f'<text x="{x+42:.1f}" y="{y+31}" font-size="11" fill="{INK_2}">{esc(l1)}</text>'
+                    f'<text x="{x+42:.1f}" y="{y+46}" font-size="11" fill="{INK_2}">{esc(l2)}</text>')
+    return card(W, H, "What I do", "".join(body))
 
 
 def main():
@@ -471,7 +513,7 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
     for fn, svg in (("overview.svg", overview_card(m)), ("languages.svg", languages_card(m)),
                     ("calendar.svg", calendar_card(m)), ("habits.svg", habits_card(m)),
-                    ("studio.svg", studio_card())):
+                    ("studio.svg", studio_card()), ("what-i-do.svg", what_i_do_card())):
         if svg:
             (OUT / fn).write_text(svg, encoding="utf-8")
     # Log only aggregate numbers — never repo names
