@@ -13,13 +13,21 @@ Shipping consumer apps end‑to‑end — product, design, code, backend, and Ap
 
 ---
 
-<!-- Figures come from studio.json (hand-maintained) — numbers only, no app names. -->
-<div align="center"><img src="metrics/studio.svg" alt="The studio: ARR, solo-built, platforms, years shipping" width="100%" /></div>
+## 🏢 The studio
+
+<div align="center">
+
+<img src="assets/studio-banner.jpg" alt="" width="100%" />
+
+<img src="metrics/studio.svg" alt="The studio: ARR, solo-built, platforms, indie since" width="100%" />
+
+</div>
+
+Started in June 2025. One year later it's a portfolio of consumer apps on the App Store and Google Play — designed, built, and grown by one person: native SwiftUI and Flutter up front, Python and Firebase behind, ASO and paid growth on top.
 
 ## 🚀 What I do
 
 I spend most of my time building and shipping iOS apps — from a blank Xcode project to a live App Store listing.
-Most of that work lives in private repos, but the activity graphs below tell the story.
 
 - 📱 **Native iOS** — SwiftUI, Widgets, Live Activities, App Intents, watchOS
 - 🐦 **Flutter** — cross‑platform apps for iOS & Android, previously led a Flutter team
@@ -28,14 +36,9 @@ Most of that work lives in private repos, but the activity graphs below tell the
 - 🌐 **Web** — Astro landing pages tuned for SEO
 - 📈 **ASO & growth** — keyword research, localized metadata, and store screenshots that convert
 
-## 🧩 Currently building
-
-> New iOS apps, in stealth until they hit the App Store. Everything stays private until launch — the graphs below are the only public trail. 👀
-
 ## 📊 Activity
 
-<!-- Cards are generated daily by scripts/generate_metrics.py via GitHub Actions — straight from the
-     GitHub API, no third-party services. Aggregate numbers + language names only. No repo names, ever. -->
+<!-- Cards are generated daily by scripts/generate_metrics.py via GitHub Actions. -->
 <div align="center">
 
 <img src="metrics/overview.svg" alt="Activity overview: commits, weekly contributions, streaks, repositories" width="100%" />

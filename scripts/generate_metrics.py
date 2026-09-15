@@ -274,7 +274,7 @@ def overview_card(m: dict) -> str:
             body.append(f'<line x1="{x-14:.0f}" y1="172" x2="{x-14:.0f}" y2="214" stroke="{BORDER}"/>')
         body.append(f'<text x="{x:.0f}" y="196" font-size="24" font-weight="700" fill="{INK}">{esc(value)}</text>'
                     f'<text x="{x:.0f}" y="213" font-size="10.5" fill="{INK_2}">{esc(label)}</text>')
-    foot = f'{m["repos_private"]} private repos · {m["followers"]} followers · {m["years"]} yrs on GitHub · includes private work · counts only'
+    foot = f'{m["followers"]} followers · {m["years"]} yrs on GitHub'
     return card(W, H, "Activity overview", "".join(body), foot)
 
 
@@ -436,31 +436,33 @@ def studio_card() -> str:
     if not cfg_path.exists():
         return ""
     cfg = json.loads(cfg_path.read_text())
-    W, H = 900, 156
+    W, H = 900, 150
     body = []
     arr = cfg.get("arr_usd")
     if arr:
         arr_txt = f"${arr/1000:.0f}K" if arr < 1_000_000 else f"${arr/1_000_000:.1f}M"
-        body.append(f'<text x="20" y="96" font-size="58" font-weight="700" fill="{INK}" letter-spacing="-1.5">{esc(arr_txt)}</text>'
-                    f'<text x="20" y="118" font-size="12" fill="{INK_2}">annual recurring revenue · portfolio of consumer apps</text>')
-    # (value, label, sub, column width)
-    tiles = [("100%", "solo-built", "design · code · backend · growth", 200)]
+        body.append(f'<text x="20" y="96" font-size="56" font-weight="700" fill="{INK}" letter-spacing="-1.5">{esc(arr_txt)}</text>'
+                    f'<text x="22" y="116" font-size="12" font-weight="600" fill="{INK_2}" letter-spacing="1.5">ARR</text>')
+    # (value, label, column width)
+    tiles = [("100%", "solo-built", 170)]
     if cfg.get("apps_live"):
-        tiles.append((str(cfg["apps_live"]), "apps live", "App Store & Google Play", 150))
+        tiles.append((str(cfg["apps_live"]), "apps live", 130))
     if cfg.get("platforms"):
-        tiles.append((esc(cfg["platforms"]), "platforms", "native iOS · Flutter · Astro", 230))
-    if cfg.get("founded_year"):
-        yrs = datetime.now().year - int(cfg["founded_year"])
-        tiles.append((f"{yrs}+ yrs", "shipping indie apps", f"since {cfg['founded_year']}", 140))
-    x = 330
-    for i, (value, label, sub, cw) in enumerate(tiles):
+        tiles.append((esc(cfg["platforms"]), "platforms", 320))
+    if cfg.get("indie_since"):
+        y0, m0 = (int(x) for x in cfg["indie_since"].split("-"))
+        now = datetime.now()
+        months = (now.year - y0) * 12 + (now.month - m0)
+        span = f"{months} mo" if months < 12 else f"{months // 12} yr" + ("s" if months >= 24 else "")
+        tiles.append((span, f"indie since {datetime(y0, m0, 1).strftime('%b %Y')}", 140))
+    x = 300
+    for i, (value, label, cw) in enumerate(tiles):
         if i:
-            body.append(f'<line x1="{x-16}" y1="62" x2="{x-16}" y2="122" stroke="{BORDER}"/>')
-        body.append(f'<text x="{x}" y="88" font-size="22" font-weight="700" fill="{INK}">{value}</text>'
-                    f'<text x="{x}" y="106" font-size="11" fill="{INK_2}">{esc(label)}</text>'
-                    f'<text x="{x}" y="120" font-size="9.5" fill="{INK_3}">{esc(sub)}</text>')
+            body.append(f'<line x1="{x-18}" y1="66" x2="{x-18}" y2="112" stroke="{BORDER}"/>')
+        body.append(f'<text x="{x}" y="94" font-size="30" font-weight="700" fill="{INK}">{value}</text>'
+                    f'<text x="{x}" y="114" font-size="11.5" fill="{INK_2}">{esc(label)}</text>')
         x += cw
-    return card(W, H, "The studio", "".join(body), "self-reported · app names stay private until launch")
+    return card(W, H, "The studio", "".join(body))
 
 
 def main():

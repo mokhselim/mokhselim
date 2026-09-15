@@ -37,8 +37,9 @@ This makes the green graph, streak card, and activity graph count private commit
 ## 4. The studio card (business figures)
 
 `studio.json` holds the hand-maintained numbers for the "The studio" card: `arr_usd`, `apps_live`
-(set a number to show an "apps live" tile, `null` hides it), `platforms`, and `founded_year`.
+(set a number to show an "apps live" tile, `null` hides it), `platforms`, and `indie_since` (`YYYY-MM`).
 Edit it, push, and the workflow re-renders the card. Numbers only — never put app names in it.
+The banner above it is a static image at `assets/studio-banner.jpg`.
 
 ## 5. What is and isn't visible (privacy)
 
